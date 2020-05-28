@@ -1,0 +1,69 @@
+<h1 class="mb-4">{{title}}</h1>
+
+<script>
+    createView = () => {
+        if(app.lang === 'de') {
+            $('.home_de').removeClass('d-none');
+            $('.home_en').addClass('d-none');
+        }
+        if(!app.isInStandaloneMode()) {
+            $('#howto').removeClass('d-none');
+        }
+    };
+</script>
+
+<h2 class="display-4 text-center">{{__ "What is this"}}?</h2>
+
+<div class="home_en">
+    {{> home_en}}
+</div>
+<div class="home_de d-none">
+    {{> home_de}}
+</div>
+
+<div id="howto" class="d-none">
+    <h2 class="display-4 mt-4 text-center">{{__ "How to install"}}?</h2>
+    <div class="jumbotron pt-3">
+        <h3 class="text-center">{{__ "Install on Android"}}</h3>
+        <div class="row lead">
+            <div class="col-xl-10 col-lg-9 col-md-8 col-sm-6">
+                <ul class="list-group">
+                    <li class="list-group-item">{{__ "Open the settings menu"}}</li>
+                    <li class="list-group-item">{{__ "Click \"Add to to Home screen\""}}</li>
+                </ul>
+            </div>
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                <img src="/images/howto_android.jpg" class="img-thumbnail"/>
+            </div>
+        </div>
+    </div>
+    <div class="jumbotron pt-3">
+        <h3 class="text-center">{{__ "Install on iOS"}}</h3>
+        <div class="row lead">
+            <div class="col-xl-10 col-lg-9 col-md-8 col-sm-6">
+                <ul class="list-group">
+                    <li class="list-group-item">{{__ "Open the share menu"}}</li>
+                    <li class="list-group-item">{{__ "Click \"Add to to Home Screen\""}}</li>
+                </ul>
+            </div>
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                <img src="/images/howto_ios.jpg" class="img-thumbnail"/>
+            </div>
+        </div>
+    </div>
+    <div class="jumbotron pt-3">
+        <h3 class="text-center">{{__ "Install on Windows/Linux"}}</h3>
+        <small>{{__ "In our example we use the Chrome browser"}}.</small>
+        <div class="row lead">
+            <div class="col-xl-10 col-lg-9 col-md-8 col-sm-6">
+                <ul class="list-group">
+                    <li class="list-group-item">{{__ "Click the \"+\" symbol at the end of the url bar"}}</li>
+                    <li class="list-group-item">{{__ "Install the progessive web app"}}</li>
+                </ul>
+            </div>
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                <img src="/images/howto_chrome.png" class="img-thumbnail"/>
+            </div>
+        </div>
+    </div>
+</div>

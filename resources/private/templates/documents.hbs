@@ -1,0 +1,358 @@
+<h1 class="mb-4">
+    {{title}}
+    <span class="float-right">
+        <a href="javascript:void(0)" onclick="documentScope.toggleAddForm()" title="{{__ "Add new"}}">
+            <i class="fas fa-plus-circle"></i>
+        </a>
+    </span>
+</h1>
+
+<script>
+    documentScope = {};
+    (function(scope) {
+        // Elements
+        let teleprompter = null;
+        let teleprompterContent = null;
+        let tpDocumentBody = null;
+        let tpDocumentBodyInner = null;
+        let tpCloseButton = null;
+        let tpPlayPauseButton = null;
+        let tpHighlightBar = null;
+        let documentTableTBody = null;
+        let addformContainer = null;
+        let editformContainer = null;
+        let documentTitle = null;
+        let documentBody = null;
+        let documentKeyEdit = null;
+        let documentTitleEdit = null;
+        let documentBodyEdit = null;
+        // Settings
+        let settings = null;
+        // Documents
+        let documents = null;
+        // teleprompter speed
+        let tpSpeed = 60;
+
+        // Create screen content for document handling
+        scope.createView = () => {
+            // Set elements
+            teleprompter = $('#tp');
+            teleprompterContent = $('#teleprompter');
+            tpDocumentBody = $('#tpDocumentBody');
+            tpDocumentBodyInner = $('#tpDocumentBody .inner');
+            tpCloseButton = $($('.tpCloseButton')[0]);
+            tpPlayPauseButton = $($('.tpPausePlayButton')[0]);
+            tpHighlightBar = $('#tpHighlightBar');
+            documentTableTBody = $('#documentsTable tbody');
+            addformContainer = $('#addformContainer');
+            editformContainer = $('#editformContainer');
+            documentTitle = $('#documentTitle');
+            documentBody = $('#documentBody');
+            documentKeyEdit = $('#documentKeyEdit');
+            documentTitleEdit = $('#documentTitleEdit');
+            documentBodyEdit = $('#documentBodyEdit');
+
+            // Get documents
+            let templateNoEntries = $.templates('#documentsTableBodyNoEnties');
+            if (app.hasDocuments()) {
+                let template = $.templates('#documentsTableBody');
+                documents = app.getDocuments();
+                $.each(documents, (key, value) => {
+                    value.key = key;
+                    documentTableTBody.append(template.render(value));
+                });
+            } else {
+                documentTableTBody.append(templateNoEntries.render());
+            }
+
+            // Get settings
+            if (app.hasSettings()) {
+                settings = app.getSettings();
+                // Apply settings to view
+                if (settings.settings.Speed >= 1) {
+                    tpSpeed = settings.settings.Speed;
+                }
+                if (settings.settings.FontSize !== '') {
+                    tpDocumentBodyInner.css('font-size', settings.settings.FontSize);
+                }
+                if (settings.settings.TextColor !== '') {
+                    tpDocumentBodyInner.css('color', settings.settings.TextColor);
+                }
+                if (settings.settings.BackgroundColor !== '') {
+                    teleprompterContent.css('background', settings.settings.BackgroundColor);
+                }
+                if (settings.settings.MirrorText === 1) {
+                    tpDocumentBodyInner.css('transform', 'ScaleX(-1)');
+                }
+                if (settings.settings.UseHighlightTool === 1) {
+                    tpHighlightBar.removeClass('d-none');
+                }
+                if (settings.settings.HighlightBackgroundColor !== '') {
+                    tpHighlightBar.css('background', settings.settings.HighlightBackgroundColor);
+                }
+            }
+
+            // HTML editor for add and edit form
+            if(tinymce.get('documentBody') != null) {
+                tinymce.remove('textarea#documentBody');
+            }
+            if(tinymce.get('documentBodyEdit') != null) {
+                tinymce.remove('textarea#documentBodyEdit');
+            }
+            $('textarea#documentBody,textarea#documentBodyEdit').tinymce({
+                theme: 'silver',
+                height: '500px',
+                menubar: false,
+                language: app.lang,
+                content_css: false,
+                mobile: {
+                    theme: 'mobile'
+                },
+                plugins: [
+                    'advlist lists preview',
+                    'searchreplace visualblocks',
+                    'table paste help wordcount'
+                ],
+                paste_enable_default_filters: false,
+                paste_word_valid_elements: "b,strong,i,em,h1,h2,h3,h4,h5,h6,ol,ul,p,br,blockquote",
+                paste_retain_style_properties: "none",
+                paste_preprocess: (plugin, args) => {
+                    let el = $('<div>' + args.content + '</div>');
+                    el.find('*').removeAttr('id').removeAttr('class').removeAttr('style').removeAttr('dir');
+                    args.content = el.html();
+                },
+                toolbar: 'undo redo | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+                branding: false
+            });
+
+            // Hammerjs for manual scrolling the teleprompter content and tap recognition
+            let hammerElement = document.getElementById('tp');
+            let mc = new Hammer(hammerElement);
+            mc.get('pan').set({direction: Hammer.DIRECTION_ALL});
+            mc.on("panup pandown", function (ev) {
+                let tpHeight = tpDocumentBody.prop('scrollHeight');
+                if (ev.type === 'panup') {
+                    scope.stopTeleprompterAnimation();
+                    tpDocumentBody.scrollTop(tpDocumentBody.scrollTop() + 15);
+                    if (tpPlayPauseButton.hasClass('fa-pause-circle')) {
+                        scope.runTeleprompterAnimation();
+                    }
+                }
+                if (ev.type === 'pandown') {
+                    scope.stopTeleprompterAnimation();
+                    tpDocumentBody.scrollTop(tpDocumentBody.scrollTop() - 15);
+                    if (tpPlayPauseButton.hasClass('fa-pause-circle')) {
+                        scope.runTeleprompterAnimation();
+                    }
+                }
+            });
+            mc.on('tap', function (ev) {
+                if(ev.center.y > 40) {
+                    scope.toggleTeleprompterAnimation(tpPlayPauseButton);
+                }
+            });
+
+            // Button events
+            tpCloseButton.on('click', () => {
+                scope.toggleTeleprompter();
+            });
+            tpPlayPauseButton.on('click', () => {
+                scope.toggleTeleprompterAnimation(tpPlayPauseButton);
+            });
+        };
+
+        // Add document
+        scope.submitAddForm = () => {
+            let _title = documentTitle.val();
+            let _document = documentBody.html();
+            if (_document !== '') {
+                app.addDocument(_title, _document);
+                app.getPage('/documents');
+            } else {
+                toastr.clear();
+                toastr.error("{{__ "I can't store an empty document"}}", "{{__ "Error"}}");
+            }
+        };
+
+        // Update document
+        scope.submitEditForm = () => {
+            let _key = documentKeyEdit.val();
+            let _title = documentTitleEdit.val();
+            let _document = documentBodyEdit.html();
+            if (_document !== '') {
+                app.updateDocument(_key, _title, _document);
+                app.getPage('/documents');
+            } else {
+                toastr.clear();
+                toastr.error("{{__ "I can't store an empty document"}}", "{{__ "Error"}}");
+            }
+        };
+
+        // Remove document
+        scope.deleteDocument = (key) => {
+            if (confirm('{{__ "Do you really want to delete this document?"}}')) {
+                app.removeDocument(key);
+                app.getPage('/documents');
+            }
+        };
+
+        // Fill edit form
+        scope.editForm = (key) => {
+            let doc = app.getDocument(key);
+            if (doc) {
+                documentKeyEdit.val(key);
+                documentTitleEdit.val(doc.title);
+                documentBodyEdit.html(doc.document);
+                editformContainer.slideDown();
+            }
+        };
+
+        // Stop scrolling
+        scope.stopTeleprompterAnimation = () => {
+            tpDocumentBody.stop();
+        };
+
+        // Animate scollbar
+        scope.runTeleprompterAnimation = () => {
+            let tpHeight = tpDocumentBody.prop('scrollHeight');
+            let tpPos = tpDocumentBody.prop('scrollTop');
+            tpDocumentBody.animate({scrollTop: tpHeight}, (tpHeight - tpPos) * tpSpeed, 'linear');
+        };
+
+        // Play document in teleprompter
+        scope.playDocument = (key) => {
+            let doc = app.getDocument(key);
+            if (doc) {
+                tpDocumentBodyInner.html(doc.document);
+                tpDocumentBodyInner.find('a').contents().unwrap(); // Remove links from document
+                tpDocumentBodyInner.css({
+                    paddingTop: $(window).height() - 48 + 'px',
+                    paddingBottom: $(window).height() - 48 + 'px'
+                });
+                scope.toggleTeleprompter();
+                scope.runTeleprompterAnimation();
+            }
+        };
+
+        // Toggle teleprompter scrolling
+        scope.toggleTeleprompterAnimation = (el) => {
+            if ($(el).hasClass('fa-pause-circle')) {
+                $(el).addClass('fa-play-circle').removeClass('fa-pause-circle');
+                scope.stopTeleprompterAnimation();
+            } else {
+                $(el).addClass('fa-pause-circle').removeClass('fa-play-circle');
+                scope.runTeleprompterAnimation();
+            }
+        };
+
+        // Show or hide the teleprompter layer
+        scope.toggleTeleprompter = () => {
+            if (teleprompter.is(':visible')) {
+                scope.stopTeleprompterAnimation();
+                tpPlayPauseButton.addClass('fa-pause-circle').removeClass('fa-play-circle');
+                tpDocumentBody.scrollTop(0);
+                teleprompter.hide();
+            } else {
+                teleprompter.show();
+            }
+        };
+
+        // Toggle document add form
+        scope.toggleAddForm = () => {
+            if (addformContainer.is(':visible')) {
+                addformContainer.slideUp();
+            } else {
+                addformContainer.slideDown();
+            }
+        };
+    }(documentScope));
+
+    // Set create view function for scope
+    createView = documentScope.createView;
+</script>
+
+<script id="documentsTableBody" type="text/x-jsrender">
+    <tr>
+        <td class="documentTitle"><%:title%></td>
+        <td>
+            <a href="javascript:void(0)" onclick="documentScope.deleteDocument('<%:key%>');"><i class="fas fa-trash fa-2x mt-1 mb-1"></i></a>
+            <a href="javascript:void(0)" onclick="documentScope.editForm('<%:key%>');"><i class="fas fa-pen-fancy fa-2x mt-1 mb-1"></i></a>
+            <a href="javascript:void(0)" onclick="documentScope.playDocument('<%:key%>');"><i class="fas fa-play-circle fa-2x mt-1"></i></a>
+        </td>
+    </tr>
+</script>
+
+<script id="documentsTableBodyNoEnties" type="text/x-jsrender">
+    <tr>
+        <td colspan="2" class="pt-5 pb-5 text-center"><i class="fas fa-exclamation-triangle display-4 mb-4"></i><br/>{{__ "No documents added yet"}}</td>
+    </tr>
+</script>
+
+<div id="addformContainer" class="mb-4" style="display: none">
+    <form id="addform" onsubmit="documentScope.submitAddForm(); return false;">
+        <div class="border p-2">
+            <div class="form-group">
+                <label for="documentTitle">{{__ "Document title"}}</label>
+                <input id="documentTitle" name="documentTitle" type="text" class="form-control" aria-describedby="documentTitleHelp" placeholder="{{__ "Enter title"}}" required="required">
+                <small id="documentTitleHelp" class="form-text text-muted">{{__ "Please enter a title for the new document"}}.</small>
+            </div>
+            <div class="form-group">
+                <label for="documentBody">{{__ "Document content"}}</label>
+                <textarea id="documentBody" name="documentBody" rows="10" class="form-control" aria-describedby="documentBodyHelp" placeholder="{{__ "Enter text"}}"></textarea>
+                <small id="documentBodyHelp">{{__ "Hint: You can use MS Word like formattings in your teleprompter document"}}.</small>
+            </div>
+            <div class="text-center mb-4">
+                <button type="submit" class="btn btn-secondary mt-1"><i class="fas fa-plus-circle"></i> {{__ "Add new document"}}</button>
+                <button type="button" class="btn btn-danger mt-1" onclick="$('#addformContainer').slideUp();"><i class="fas fa-arrow-up"></i> {{__ "Close"}}</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="editformContainer" class="mb-4" style="display: none">
+    <form id="editform" onsubmit="documentScope.submitEditForm(); return false;">
+        <input type="hidden" id="documentKeyEdit" value=""/>
+        <div class="border p-2">
+            <div class="form-group">
+                <label for="documentTitleEdit">{{__ "Document title"}}</label>
+                <input id="documentTitleEdit" name="documentTitleEdit" type="text" class="form-control" placeholder="{{__ "Enter title"}}" required="required">
+            </div>
+            <div class="form-group">
+                <label for="documentBodyEdit">{{__ "Document content"}}</label>
+                <textarea id="documentBodyEdit" name="documentBodyEdit" rows="10" class="form-control" aria-describedby="documentBodyHelpEdit" placeholder="{{__ "Enter text"}}"></textarea>
+                <small id="documentBodyHelpEdit">{{__ "Hint: You can use MS Word like formattings in your teleprompter document"}}.</small>
+            </div>
+            <div class="text-center mb-4">
+                <button type="submit" class="btn btn-secondary mt-1"><i class="fas fa-pen-fancy"></i> {{__ "Update document"}}</button>
+                <button type="button" class="btn btn-danger mt-1" onclick="$('#editformContainer').slideUp();"><i class="fas fa-arrow-up"></i> {{__ "Cancel"}}</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<table id="documentsTable" class="table table-bordered">
+    <colgroup>
+        <col span="1" style="width: 65%;">
+        <col span="1" style="width: 35%;">
+    </colgroup>
+    <thead class="thead-light">
+        <tr>
+            <th>{{__ "Title"}}</th>
+            <th>{{__ "Options"}}</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<div id="tp">
+    <div id="teleprompter">
+        <div id="tpButtons">
+            <i class="tpCloseButton ml-2 mt-2 mb-2 fas fa-window-close fa-2x text-white"></i>
+            <i class="tpPausePlayButton ml-2 mt-2 mb-2 fas fa-pause-circle fa-2x text-white"></i>
+        </div>
+        <div id="tpDocumentBody" class="text-white">
+            <div class="inner"></div>
+        </div>
+    </div>
+    <div id="tpHighlightBar" class="d-none"></div>
+</div>

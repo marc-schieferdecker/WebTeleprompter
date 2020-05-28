@@ -1,0 +1,36 @@
+<script>
+    createView = () => {
+        if(app.lang === 'de') {
+            $('.donate_de').removeClass('d-none');
+            $('.donate_en').addClass('d-none');
+        }
+    };
+</script>
+
+<div class="donate_en">
+    {{> donate_en}}
+</div>
+<div class="donate_de d-none">
+    {{> donate_de}}
+</div>
+
+<div class="mb-4 text-center">
+    <small>{{__ "click to donate"}}</small>
+    <br/>
+    <i class="fas fa-arrow-down fa-3x"></i>
+</div>
+
+<div class="donationbox list-inline mb-4 border-secondary border float-right float-md-none float-sm-none p-4 bg-white shadow-sm text-center">
+    <li class="list-inline-item mr-3">
+        <a href="javascript:void(0);" onclick="$('#donationform2').submit(); return false;">
+            <i class="fab fa-paypal fa-2x fa-fw float-left"></i>
+            <em>{{__ "Do you like the Web Teleprompter App? Please donate!"}}</em>
+            <i class="fas fa-heart fa-2x fa-fw float-right"></i>
+            <form id="donationform2" action="https://www.paypal.com/cgi-bin/webscr" method="post" autocomplete="off">
+                <input type="hidden" name="cmd" value="_s-xclick" autocomplete="off">
+                <input type="hidden" name="item_name" value="Web Teleprompter App" autocomplete="off">
+                <input type="hidden" name="hosted_button_id" value="N3XHP4EAX49B8" autocomplete="off">
+            </form>
+        </a>
+    </li>
+</div>

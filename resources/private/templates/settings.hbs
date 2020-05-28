@@ -1,0 +1,189 @@
+<h1 class="mb-4">{{title}}</h1>
+
+<script>
+    settingsScope = {};
+    (function(scope) {
+        // Settings
+        let settings = null;
+
+        scope.createView = () => {
+            // Get settings
+            if(app.hasSettings()) {
+                settings = app.getSettings();
+            }
+            // Set settings form values
+            if(settings !== null) {
+                if(settings.settings.Speed >= 1) {
+                    $('#settingsSpeed').val(settings.settings.Speed);
+                }
+                if(settings.settings.FontSize !== '') {
+                    $('#settingsFontSize').val(settings.settings.FontSize);
+                }
+                if(settings.settings.TextColor !== '') {
+                    $('#settingsTextColor').val(settings.settings.TextColor);
+                }
+                if(settings.settings.BackgroundColor !== '') {
+                    $('#settingsBackgroundColor').val(settings.settings.BackgroundColor);
+                }
+                if(settings.settings.MirrorText !== '') {
+                    $('#settingsMirrorText option[value="'+settings.settings.MirrorText+'"]').prop('selected', true);
+                }
+                if(settings.settings.UseHighlightTool !== '') {
+                    $('#settingsUseHighlightTool option[value="'+settings.settings.UseHighlightTool+'"]').prop('selected', true);
+                }
+                if(settings.settings.HighlightBackgroundColor !== '') {
+                    $('#settingsHighlightBackgroundColor').val(settings.settings.HighlightBackgroundColor);
+                }
+            }
+
+            // Colorpickers
+            $('.colorpicker').each((i,e)=>{
+                $(e).spectrum({
+                    preferredFormat: "hex",
+                    showAlpha: true,
+                    showInput: true,
+                    showInitial: true,
+                    color: $('#'+$(e).attr('colorpicker-data-target')).val(),
+                    cancelText: $(e).attr('colorpicker-text-cancel'),
+                    chooseText: $(e).attr('colorpicker-text-choose'),
+                    change: function(color) {
+                        let cpElement = $('#'+$(e).attr('colorpicker-data-target'));
+                        cpElement.val('rgba('+parseInt(color._r)+','+parseInt(color._g)+','+parseInt(color._b)+','+color._a+')');
+                        $(e).find('i').css({color: cpElement.val()});
+                    }
+                });
+            });
+
+            // Set language
+            $('#setLanguage option[value="'+app.lang+'"]').prop('selected', true);
+            $('#setLanguage').on('change', (el) => {
+                // If service worker is active, unregister service worker, to cache views with the new language
+                if(swRegistration != null) {
+                    swRegistration.unregister().then(() => {
+                        scope.saveSettings(false);
+                        document.location.href = '/settings?lang=' + $(el.target).val();
+                    });
+                }
+                else {
+                    scope.saveSettings(false);
+                    document.location.href = '/settings?lang=' + $(el.target).val();
+                }
+            });
+        };
+
+        // Get settings an store them in storage
+        scope.saveSettings = (showToast) => {
+            let settingsSpeed = $('#settingsSpeed').val();
+            let settingsFontSize = $('#settingsFontSize').val();
+            let settingsTextColor = $('#settingsTextColor').val();
+            let settingsBackgroundColor = $('#settingsBackgroundColor').val();
+            let settingsMirrorText = $('#settingsMirrorText').val();
+            let settingsUseHighlightTool = $('#settingsUseHighlightTool').val();
+            let settingsHighlightBackgroundColor = $('#settingsHighlightBackgroundColor').val();
+            let settings = {
+                Speed: parseInt(settingsSpeed),
+                FontSize: settingsFontSize,
+                TextColor: settingsTextColor,
+                BackgroundColor: settingsBackgroundColor,
+                MirrorText: parseInt(settingsMirrorText),
+                UseHighlightTool: parseInt(settingsUseHighlightTool),
+                HighlightBackgroundColor: settingsHighlightBackgroundColor
+            };
+            app.setSettings(settings);
+            if(showToast) {
+                toastr.success('{{__ "Your settings have been saved"}}', '{{__ "Settings saved"}}');
+            }
+        }
+    }(settingsScope));
+
+    // Set create view function for scope
+    createView = settingsScope.createView;
+</script>
+
+<form id="settingsform" onsubmit="settingsScope.saveSettings(true); return false;">
+    <h2 class="display-4">{{__ "Change language"}}</h2>
+    <div class="border p-2">
+        <div class="form-group">
+            <label for="setLanguage">{{__ "Language"}}?</label>
+            <select id="setLanguage" name="setLanguage" class="form-control form-control-lg">
+                <option value="en">English</option>
+                <option value="de">Deutsch</option>
+            </select>
+            <small>{{__ "This requires an active internet connection"}}!</small>
+        </div>
+    </div>
+
+    <h2 class="display-4 mt-4">{{__ "Teleprompter appearance"}}</h2>
+    <small>{{__ "Leave values empty to use default settings"}}.</small>
+    <div class="border p-2 mt-2">
+        <div class="form-group">
+            <label for="settingsSpeed">{{__ "Speed"}}</label>
+            <input id="settingsSpeed" name="settingsSpeed" type="number" min="1" max="1000" class="form-control form-control-lg" aria-describedby="settingsSpeedHelp" placeholder="{{__ "60"}}">
+            <small id="settingsSpeedHelp" class="form-text text-muted">{{__ "The default speed is 60"}}. {{__ "The lower the value the faster the scrolling"}}.</small>
+        </div>
+        <div class="form-group">
+            <label for="settingsFontSize">{{__ "Font size"}}</label>
+            <input id="settingsFontSize" name="settingsFontSize" type="text" class="form-control form-control-lg" aria-describedby="settingsFontSizeHelp" placeholder="{{__ "50px"}}">
+            <small id="settingsFontSizeHelp" class="form-text text-muted">
+                {{__ "The default font size is 50px"}}.
+                <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-size">{{__ "More informations on valid font size values"}}</a>.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="settingsTextColor">{{__ "Text color"}}?</label>
+            <div class="input-group">
+                <input id="settingsTextColor" type="text" name="settingsTextColor" class="form-control form-control-lg" aria-describedby="settingsTextColorHelp" placeholder="{{__ "Select text color"}}">
+                <span class="input-group-append">
+                    <span class="input-group-text colorpicker" colorpicker-data-target="settingsTextColor" colorpicker-text-cancel="{{__ "Cancel"}}" colorpicker-text-choose="{{__ "Choose"}}">
+                        <i class="fas fa-palette"></i>
+                    </span>
+                </span>
+            </div>
+            <small id="settingsTextColorHelp" class="form-text text-muted">{{__ "The default font color is white"}}.</small>
+        </div>
+        <div class="form-group">
+            <label for="settingsBackgroundColor">{{__ "Background color"}}?</label>
+            <div class="input-group">
+                <input id="settingsBackgroundColor" type="text" name="settingsBackgroundColor" class="form-control form-control-lg" aria-describedby="settingsBackgroundColorHelp" placeholder="{{__ "Select background color"}}">
+                <span class="input-group-append">
+                    <span class="input-group-text colorpicker" colorpicker-data-target="settingsBackgroundColor" colorpicker-text-cancel="{{__ "Cancel"}}" colorpicker-text-choose="{{__ "Choose"}}">
+                        <i class="fas fa-palette"></i>
+                    </span>
+                </span>
+            </div>
+            <small id="settingsBackgroundColorHelp" class="form-text text-muted">{{__ "The default background color is black"}}.</small>
+        </div>
+        <div class="form-group">
+            <label for="settingsMirrorText">{{__ "Mirror text"}}?</label>
+            <select id="settingsMirrorText" name="settingsMirrorText" class="form-control form-control-lg" aria-describedby="settingsMirrorTextHelp">
+                <option value="0">{{__ "No"}}</option>
+                <option value="1">{{__ "Yes"}}</option>
+            </select>
+            <small id="settingsMirrorTextHelp" class="form-text text-muted">{{__ "Use this option to use the Web Teleprompter App with mirror teleprompters"}}.</small>
+        </div>
+        <div class="form-group">
+            <label for="settingsUseHighlightTool">{{__ "Use highlight bar"}}?</label>
+            <select id="settingsUseHighlightTool" name="settingsUseHighlightTool" class="form-control form-control-lg" aria-describedby="settingsUseHighlightToolHelp">
+                <option value="0">{{__ "No"}}</option>
+                <option value="1">{{__ "Yes"}}</option>
+            </select>
+            <small id="settingsUseHighlightToolHelp" class="form-text text-muted">{{__ "If you activate this a bar to highlight text will appear in the center of the screen"}}.</small>
+        </div>
+        <div class="form-group">
+            <label for="settingsHighlightBackgroundColor">{{__ "Background color of hightlight bar"}}?</label>
+            <div class="input-group">
+                <input id="settingsHighlightBackgroundColor" type="text" name="settingsHighlightBackgroundColor" class="form-control form-control-lg" aria-describedby="settingsHighlightBackgroundColorHelp" placeholder="{{__ "Select background color"}}">
+                <span class="input-group-append">
+                    <span class="input-group-text colorpicker" colorpicker-data-target="settingsHighlightBackgroundColor" colorpicker-text-cancel="{{__ "Cancel"}}" colorpicker-text-choose="{{__ "Choose"}}">
+                        <i class="fas fa-palette"></i>
+                    </span>
+                </span>
+            </div>
+            <small id="settingsHighlightBackgroundColorHelp" class="form-text text-muted">{{__ "Be sure to use a color with a high transparency value or reading will be difficult"}}.</small>
+        </div>
+        
+        <div class="text-center mt-4 mb-4">
+            <button type="submit" class="btn btn-secondary"><i class="fas fa-check"></i> {{__ "Save settings"}}</button>
+        </div>
+    </div>
+</form>
