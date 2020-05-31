@@ -1,4 +1,4 @@
-const CACHE_NAME = 'WebTeleprompter-Cache-v7';
+const CACHE_NAME = 'WebTeleprompter-Cache-v8';
 const urlsToCache = [
 	// URLs
 	'/',
@@ -28,9 +28,6 @@ const urlsToCache = [
 	'/lib/tinymce/jquery.tinymce.min.js',
 	'/lib/js/libs.min.js',
 	'/javascripts/app.js',
-	'/images/howto_android.jpg',
-	'/images/howto_chrome.png',
-	'/images/howto_ios.jpg',
 	'/lib/webfonts/fa-brands-400.eot',
 	'/lib/webfonts/fa-brands-400.svg',
 	'/lib/webfonts/fa-brands-400.ttf',

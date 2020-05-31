@@ -2,61 +2,46 @@
 
 <script>
     createView = () => {
-        if(!app.isInStandaloneMode()) {
-            $('#howto').removeClass('d-none');
+        if (!app.isInStandaloneMode()) {
+            // Install prompt
+            if($('#pwaInstallPrompt').length) {
+                let deferredPrompt;
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    // Prevent the mini-infobar from appearing on mobile
+                    e.preventDefault();
+                    // Stash the event so it can be triggered later.
+                    deferredPrompt = e;
+                    // Show install prompt window
+                    $('#pwaInstallPrompt').removeClass('d-none');
+                });
+
+                $('#pwaInstallButton').on('click', (e) => {
+                    // Hide the app provided install promotion
+                    $('#pwaInstallPrompt').remove();
+                    // Show the install prompt
+                    deferredPrompt.prompt();
+                    // Wait for the user to respond to the prompt
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        $('#pwaInstallPrompt').remove();
+                    });
+                });
+
+                $('#pwaInstallButtonAbort').on('click', () => {
+                    $('#pwaInstallPrompt').remove();
+                });
+            }
         }
     };
 </script>
+
+<div id="pwaInstallPrompt" class="d-none p-2 text-center fixed-top">
+    <p><strong>{{__ "Install as App"}}?</strong></p>
+    <button class="btn btn-success btn-sm" id="pwaInstallButton">{{__ "Install"}}</button>
+    <button class="btn btn-danger btn-sm" id="pwaInstallButtonAbort">{{__ "Close"}}</button>
+</div>
 
 <h2 class="display-4 text-center">{{__ "What is this"}}?</h2>
 
 <div class="jumbotron">
     {{{__ "HomeIntroduction"}}}
-</div>
-
-<div id="howto" class="d-none">
-    <h2 class="display-4 mt-4 text-center">{{__ "How to install"}}?</h2>
-    <div class="jumbotron pt-3">
-        <h3 class="text-center">{{__ "Install on Android"}}</h3>
-        <div class="row lead">
-            <div class="col-xl-10 col-lg-9 col-md-8 col-sm-6">
-                <ul class="list-group">
-                    <li class="list-group-item">{{__ "Open the settings menu"}}</li>
-                    <li class="list-group-item">{{__ "Click \"Add to to Home screen\""}}</li>
-                </ul>
-            </div>
-            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-                <img src="/images/howto_android.jpg" class="img-thumbnail"/>
-            </div>
-        </div>
-    </div>
-    <div class="jumbotron pt-3">
-        <h3 class="text-center">{{__ "Install on iOS"}}</h3>
-        <div class="row lead">
-            <div class="col-xl-10 col-lg-9 col-md-8 col-sm-6">
-                <ul class="list-group">
-                    <li class="list-group-item">{{__ "Open the share menu"}}</li>
-                    <li class="list-group-item">{{__ "Click \"Add to to Home Screen\""}}</li>
-                </ul>
-            </div>
-            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-                <img src="/images/howto_ios.jpg" class="img-thumbnail"/>
-            </div>
-        </div>
-    </div>
-    <div class="jumbotron pt-3">
-        <h3 class="text-center">{{__ "Install on Windows/Linux"}}</h3>
-        <small>{{__ "In our example we use the Chrome browser"}}.</small>
-        <div class="row lead">
-            <div class="col-xl-10 col-lg-9 col-md-8 col-sm-6">
-                <ul class="list-group">
-                    <li class="list-group-item">{{__ "Click the \"+\" symbol at the end of the url bar"}}</li>
-                    <li class="list-group-item">{{__ "Install the progessive web app"}}</li>
-                </ul>
-            </div>
-            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-                <img src="/images/howto_chrome.png" class="img-thumbnail"/>
-            </div>
-        </div>
-    </div>
 </div>
