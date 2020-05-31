@@ -1,5 +1,4 @@
 {
-	"60": "60",
 	"Home": "Home",
 	"WebTeleprompter": "WebTeleprompter",
 	"Donate if you like": "Donate if you like",
@@ -70,5 +69,7 @@
 	"Click the \"+\" symbol at the end of the url bar": "Click the \"+\" symbol at the end of the url bar",
 	"Install the progessive web app": "Install the progessive web app",
 	"Show some love": "Show some love",
-	"This requires an active internet connection": "This requires an active internet connection"
+	"This requires an active internet connection": "This requires an active internet connection",
+	"HomeIntroduction": "<p class=\"lead\">This is a teleprompter application that runs in your browser. You can also install this application on your smartphone or personal computer (iOS, Android, Windows, ...).</p>\n<p class=\"lead\">All data is stored locally on your client. Once installed on your phone or computer you can even use this application without an internet connection.</p>\n<p class=\"lead\">The WebTeleprompter application supports currently english an german language and you can set many options to configure your teleprompter screen. Check the <a href=\"/settings\" onclick=\"app.getPage(this.href); return false\">settings</a>!</p>\n<p class=\"lead\">FAQ: Yes this application supports mirrored text. You can use it with teleprompter devices that use mirrors for displaying the text.</p>",
+	"DonateText": "<h2 class=\"display-4\">Hello, world!</h2>\n<p class=\"lead\">I developed this teleprompter web app in my spare time, because all the Android apps out there where not exactly what I needed or to expensive. As professional software developer (<a href=\"https://youtube.com/eisenfell\">and YouTuber</a>) I decided to create my own app.</p>\n<p class=\"lead\">So here it is and it's free for you to use. If you have any suggestions contact me: <a href=\"mailto:ms@letsshootshow.de?subject=WebTeleprompterApp suggestion\">ms@letsshootshow.de</a>.</p>\n<p class=\"lead\">If you like this peace of software I would be happy to receive a small <a href=\"https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=N3XHP4EAX49B8&source=url\">donation via Paypal</a>.</p>\n<p class=\"lead\">Sincerely,</p>\n<p class=\"lead\">Marc</p>"
 }

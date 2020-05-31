@@ -1,17 +1,5 @@
-<script>
-    createView = () => {
-        if(app.lang === 'de') {
-            $('.donate_de').removeClass('d-none');
-            $('.donate_en').addClass('d-none');
-        }
-    };
-</script>
-
-<div class="donate_en">
-    {{> donate_en}}
-</div>
-<div class="donate_de d-none">
-    {{> donate_de}}
+<div class="jumbotron mt-4 mb-4">
+    {{{__ "DonateText"}}}
 </div>
 
 <div class="mb-4 text-center">

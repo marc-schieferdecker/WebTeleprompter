@@ -2,10 +2,6 @@
 
 <script>
     createView = () => {
-        if(app.lang === 'de') {
-            $('.home_de').removeClass('d-none');
-            $('.home_en').addClass('d-none');
-        }
         if(!app.isInStandaloneMode()) {
             $('#howto').removeClass('d-none');
         }
@@ -14,11 +10,8 @@
 
 <h2 class="display-4 text-center">{{__ "What is this"}}?</h2>
 
-<div class="home_en">
-    {{> home_en}}
-</div>
-<div class="home_de d-none">
-    {{> home_de}}
+<div class="jumbotron">
+    {{{__ "HomeIntroduction"}}}
 </div>
 
 <div id="howto" class="d-none">

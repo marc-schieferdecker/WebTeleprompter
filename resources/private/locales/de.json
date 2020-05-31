@@ -1,5 +1,4 @@
 {
-	"60": "60",
 	"Web Teleprompter App": "Web Teleprompter App",
 	"WebTeleprompter": "WebTeleprompter",
 	"Home": "Start",
@@ -70,5 +69,7 @@
 	"In our example we use the Chrome browser": "In unserem Beispiel verwenden wir Chrome",
 	"Click the \"+\" symbol at the end of the url bar": "Klicke das \"+\" Symbol am Ende der URL Zeile",
 	"Install the progessive web app": "Installiere die Progessive Web App",
-	"This requires an active internet connection": "Dies benötigt eine funktionierende Internetverbindung"
+	"This requires an active internet connection": "Dies benötigt eine funktionierende Internetverbindung",
+	"HomeIntroduction": "<p class=\"lead\">Dies ist eine Teleprompter Anwendung, die im Browser läuft. Du kannst diese App aber auch auf deinem Smartphone, Tablet, oder persönlichem Computer installieren (iOS, Android, Windows, ...).</p>\n<p class=\"lead\">Alle Daten werden lokal auf Deinem Client gespeichert. Ist die Anwendung einmal auf Deinem Tablet oder Smartphone installiert, läuft sie auch ohne Internet-Verbindung.</p>\n<p class=\"lead\">Die WebTeleprompter Anwendung unterstützt derzeit die Sprachen Deutsch und Englisch. Außerdem kannst Du noch viele Dinge selbst konfigurieren, schau mal in die <a href=\"/settings\" onclick=\"app.getPage(this.href); return false\">Einstellungen</a>!</p>\n<p class=\"lead\">FAQ: Ja, diese Anwendung unterstützt gespiegelten Text. Du kannst damit Teleprompter Geräte verwenden, die einen gespiegelten Text brauchen, um diesen anzuzeigen.</p>",
+	"DonateText": "<h2 class=\"display-4\">Hello, world!</h2>\n<p class=\"lead\">Ich habe die Teleprompter Web App entwickelt, weil alle Angebote für Android mir nicht wirklich gefielen, oder mir zu teuer waren. Als professioneller Software Entwickler (<a href=\"https://youtube.com/eisenfell\">und YouTuber</a>) habe ich entschieden, einfach meine eigene App zu entwickeln.</p>\n<p class=\"lead\">Hier ist also die App und sie frei verwendbar. Wenn Du irgendwelche Vorschläge für die Weiterenwicklung hast, schreibe mir: <a href=\"mailto:ms@letsshootshow.de?subject=WebTeleprompterApp Vorschlag\">ms@letsshootshow.de</a>.</p>\n<p class=\"lead\">Wenn Du dieses Stück Software magst, würde ich mich über eine kleine <a href=\"https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=N3XHP4EAX49B8&source=url\">Spende via Paypal</a> freuen.</p>\n<p class=\"lead\">Herzliche Grüße,</p>\n<p class=\"lead\">Marc</p>"
 }
