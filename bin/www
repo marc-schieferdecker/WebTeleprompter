@@ -16,12 +16,27 @@ var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
- * Create HTTP secure server
+ * Create HTTP secure server and socket.io server
  */
 var server = https.createServer({
   key: fs.readFileSync(path.join(__dirname, 'certstore', 'localhost-key.pem')).toString(),
   cert: fs.readFileSync(path.join(__dirname, 'certstore', 'localhost.pem')).toString()
 }, app);
+const io = require('socket.io')(server);
+io.on('connection', client => {
+  // Welcome message to client
+  client.emit('welcome', {hello: 'Welcome to the socket server!'});
+
+  // Broadcast events to all connected clients
+  client.on('event', (data) => {
+    client.broadcast.emit('broadcast', data);
+  });
+
+  // Disconnect handler
+  client.on('disconnect', () => {
+
+  });
+});
 server.listen(normalizePort(process.env.PORTSSL || 443));
 server.on('error', onError);
 server.on('listening', onListening);

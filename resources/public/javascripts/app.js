@@ -17,6 +17,18 @@ class WebTelepromterApp {
         this.settings = store.namespace('settings');
         this.documents = store.namespace('documents');
 
+        // Socket client
+        this.socket = io('/');
+        this.socket.on('connect', () => { console.log('socket connected'); });
+        this.socket.on('welcome', (data) => { console.log('socketdata', data); });
+        this.socket.on('broadcast', (data) => { this.socketDataHandler(data); });
+        this.socket.on('disconnect', () => { console.log('socket disconnected'); });
+
+        // Share documents
+        this.sharingKey = '';
+        this.importKey = '';
+        this.sharingDocument = {};
+
         // JsRender config
         $.views.settings.delimiters("<%", "%>", "*");
 
@@ -169,5 +181,31 @@ class WebTelepromterApp {
         // Set menu element to active
         $('.nav-item').removeClass('active');
         $('.controller'+this.controller).addClass('active');
+    }
+
+    importDocument() {
+        if(this.importKey !== '') {
+            this.socket.emit('event', {getDocument: this.importKey});
+        }
+    }
+
+    socketDataHandler(data) {
+        if(data.getDocument) {
+            if(data.getDocument === this.sharingKey && this.sharingKey !== '' && app.sharingDocument.title) {
+                this.socket.emit('event', {sendDocument: this.sharingKey, document: this.sharingDocument});
+                this.sharingKey = '';
+                // Close modal
+                if($('#sharingModal').length) {
+                    $('#sharingModal').modal('hide');
+                }
+            }
+        }
+        if(data.sendDocument) {
+            if(data.sendDocument === this.importKey && data.document.title && data.document.document) {
+                this.addDocument(data.document.title, data.document.document);
+                this.importKey = '';
+                this.getPage('/documents');
+            }
+        }
     }
 }

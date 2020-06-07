@@ -19,7 +19,8 @@ function libs() {
             'node_modules/bootstrap/dist/js/bootstrap.bundle.js',
             'node_modules/tinymce-i18n/langs5/de.js',
             'node_modules/object-hash/dist/object_hash.js',
-            'node_modules/spectrum-colorpicker/spectrum.js'
+            'node_modules/spectrum-colorpicker/spectrum.js',
+            'node_modules/socket.io-client/dist/socket.io.js'
         ])
         .pipe(concat('libs.js'))
         .pipe(minify({

@@ -207,6 +207,23 @@
             }
         };
 
+        // Transfer document to another device
+        scope.transferDocument = (key) => {
+            app.sharingDocument = app.getDocument(key);
+            if (app.sharingDocument) {
+                // Create unique import key
+                app.sharingKey = scope.generateUID();
+                // Create modal with sharing key
+                $('#sharingModal #sharingKey').text(app.sharingKey);
+                $('#sharingModal').modal();
+            }
+        };
+
+        scope.importDocument = () => {
+            app.importKey = $('#importKey').val();
+            app.importDocument();
+        };
+
         // Stop scrolling
         scope.stopTeleprompterAnimation = () => {
             tpDocumentBody.stop();
@@ -265,6 +282,15 @@
                 addformContainer.slideDown();
             }
         };
+
+        // Create unique ID
+        scope.generateUID = () => {
+            let firstPart = (Math.random() * 46656) | 0;
+            let secondPart = (Math.random() * 46656) | 0;
+            firstPart = ("000" + firstPart.toString(36)).slice(-3);
+            secondPart = ("000" + secondPart.toString(36)).slice(-3);
+            return firstPart + secondPart;
+        }
     }(documentScope));
 
     // Set create view function for scope
@@ -277,7 +303,8 @@
         <td>
             <a href="javascript:void(0)" onclick="documentScope.deleteDocument('<%:key%>');"><i class="fas fa-trash fa-2x mt-1 mb-1"></i></a>
             <a href="javascript:void(0)" onclick="documentScope.editForm('<%:key%>');"><i class="fas fa-pen-fancy fa-2x mt-1 mb-1"></i></a>
-            <a href="javascript:void(0)" onclick="documentScope.playDocument('<%:key%>');"><i class="fas fa-play-circle fa-2x mt-1"></i></a>
+            <a href="javascript:void(0)" onclick="documentScope.playDocument('<%:key%>');"><i class="fas fa-play-circle fa-2x mb-1"></i></a>
+            <a href="javascript:void(0)" onclick="documentScope.transferDocument('<%:key%>');"><i class="fas fa-share-alt fa-2x mt-1"></i></a>
         </td>
     </tr>
 </script>
@@ -304,6 +331,22 @@
             <div class="text-center mb-4">
                 <button type="submit" class="btn btn-secondary mt-1"><i class="fas fa-plus-circle"></i> {{__ "Add new document"}}</button>
                 <button type="button" class="btn btn-danger mt-1" onclick="$('#addformContainer').slideUp();"><i class="fas fa-arrow-up"></i> {{__ "Close"}}</button>
+            </div>
+        </div>
+    </form>
+
+    <form id="importDocument" class="mt-2" onsubmit="documentScope.importDocument(); return false;">
+        <div class="border p-2">
+            <h3>{{__ "Import document"}}</h3>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-6">
+                        <input type="text" class="form-control" id="importKey" required="required" placeholder="{{__ "Enter key"}}"/>
+                    </div>
+                    <div class="col-6">
+                        <button type="submit" class="btn btn-secondary"><i class="fas fa-plus-circle"></i> {{__ "Import"}}</button>
+                    </div>
+                </div>
             </div>
         </div>
     </form>
@@ -355,4 +398,24 @@
         </div>
     </div>
     <div id="tpHighlightBar" class="d-none"></div>
+</div>
+
+<div id="sharingModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{__ "Send document"}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="{{__ "Close"}}">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center">{{__ "Enter this code on the target device to import the document:"}}</p>
+                <div id="sharingKey" class="text-danger display-4 text-center"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__ "Close"}}</button>
+            </div>
+        </div>
+    </div>
 </div>
