@@ -1,4 +1,4 @@
-const CACHE_NAME = 'WebTeleprompter-Cache-v8';
+const CACHE_NAME = 'WebTeleprompter-Cache-v9';
 const urlsToCache = [
 	// URLs
 	'/',
