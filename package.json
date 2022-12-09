@@ -35,7 +35,7 @@
     "object-hash": "^2.0.1",
     "spectrum-colorpicker": "^1.8.0",
     "store2": "^2.10.0",
-    "tinymce": "^5.2.2",
+    "tinymce": "^5.10.7",
     "tinymce-i18n": "^19.9.17",
     "toastr": "^2.1.4"
   }
